@@ -54,6 +54,7 @@ const LandingPage: React.FC = () => {
         members: [userName],
         preferences: {},
         createdAt: Timestamp.now(),
+        votes: {}
         });
 
 
