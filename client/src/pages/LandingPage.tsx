@@ -11,6 +11,8 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 
+import './LandingPage.css'; // Add styles here
+
 const LandingPage: React.FC = () => {
   const [userName, setUserName] = useState('');
   const [joinCode, setJoinCode] = useState('');
@@ -42,9 +44,9 @@ const LandingPage: React.FC = () => {
       const twelveHoursAgo = Date.now() - 12 * 60 * 60 * 1000;
 
       if (createdAt < twelveHoursAgo) {
-        await deleteDoc(roomRef); // Cleanup old room
+        await deleteDoc(roomRef);
       } else {
-        return handleCreateRoom(); // Collision: generate a new code
+        return handleCreateRoom();
       }
     }
 
@@ -54,9 +56,8 @@ const LandingPage: React.FC = () => {
         members: [userName],
         preferences: {},
         createdAt: Timestamp.now(),
-        votes: {}
-        });
-
+        votes: {},
+      });
 
       localStorage.setItem('userName', userName);
       navigate(`/room/${code}`);
@@ -105,18 +106,18 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div style={{ maxWidth: '400px', margin: '100px auto', textAlign: 'center' }}>
-      <h1>MovieMatch</h1>
+    <div className="landing-container">
+      <h1 className="title">MovieMatch</h1>
 
       <input
         type="text"
         placeholder="Enter your name"
         value={userName}
         onChange={(e) => setUserName(e.target.value)}
-        style={{ width: '100%', padding: '10px', marginBottom: '20px' }}
+        className="input"
       />
 
-      <button onClick={handleCreateRoom} style={{ width: '100%', padding: '10px', marginBottom: '20px' }}>
+      <button onClick={handleCreateRoom} className="button">
         Create Room
       </button>
 
@@ -125,14 +126,14 @@ const LandingPage: React.FC = () => {
         placeholder="Enter room code"
         value={joinCode}
         onChange={(e) => setJoinCode(e.target.value)}
-        style={{ width: '100%', padding: '10px', marginBottom: '10px' }}
+        className="input"
       />
 
-      <button onClick={handleJoinRoom} style={{ width: '100%', padding: '10px' }}>
+      <button onClick={handleJoinRoom} className="button">
         Join Room
       </button>
 
-      {error && <p style={{ color: 'red', marginTop: '20px' }}>{error}</p>}
+      {error && <p className="error">{error}</p>}
     </div>
   );
 };
