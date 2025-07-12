@@ -6,20 +6,21 @@ import {
   doc,
   onSnapshot,
   updateDoc,
-  getDoc,
-  deleteDoc,
-  arrayUnion,
-  Timestamp,
+  deleteField,
 } from 'firebase/firestore';
+import { Check, Clock, Loader, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
+
+
 
 import './RoomPage.css';
 
 const placeholders = [
-  'I love thrillers with plot twists',
-  'Animated comedies under 2 hours',
-  'Something romantic but not cheesy',
-  'Dark sci-fi or dystopian',
-  'Movies with strong female leads',
+  'e.g., I love thrillers with plot twists',
+  'e.g., Animated comedies under 2 hours',
+  'e.g., Something romantic but not cheesy',
+  'e.g., Dark sci-fi or dystopian',
+  'e.g., Movies with strong female leads',
 ];
 
 const RoomPage: React.FC = () => {
@@ -33,6 +34,8 @@ const RoomPage: React.FC = () => {
   const [recommendations, setRecommendations] = useState<any[]>([]);
   const [votes, setVotes] = useState<{ [title: string]: { [user: string]: 'up' | 'down' } }>({});
   const [toast, setToast] = useState('');
+  const [expandedDescriptions, setExpandedDescriptions] = useState<{ [title: string]: boolean }>({});
+
 
   useEffect(() => {
     const name = localStorage.getItem('userName');
@@ -96,17 +99,26 @@ const RoomPage: React.FC = () => {
   };
 
   const handleVote = async (title: string, direction: 'up' | 'down') => {
-    const currentVote = votes[title]?.[userName];
-    if (currentVote === direction) return;
-    const roomRef = doc(db, 'rooms', roomId!);
-    try {
+  const currentVote = votes[title]?.[userName];
+  const roomRef = doc(db, 'rooms', roomId!);
+
+  try {
+    if (currentVote === direction) {
+      // Remove the vote
       await updateDoc(roomRef, {
-        [`votes.${title}.${userName}`]: direction,
+        [`votes.${title}.${userName}`]: deleteField()
       });
-    } catch (err) {
-      console.error("Failed to vote:", err);
+    } else {
+      // Set the new vote
+      await updateDoc(roomRef, {
+        [`votes.${title}.${userName}`]: direction
+      });
     }
-  };
+  } catch (err) {
+    console.error("Failed to vote:", err);
+  }
+};
+
 
   const voteStats = (title: string) => {
     const voteEntries = Object.values(votes[title] || {});
@@ -119,68 +131,158 @@ const RoomPage: React.FC = () => {
   const submittedCount = members.filter((m) => preferences[m]).length;
 
   return (
-    <div className="room-container">
-      <h1>Room: {roomId}</h1>
-      <h2>Welcome, {userName}</h2>
+    <div className="page-wrapper">
+      <nav className="navbar">
+        <div className="logo">
+          <img src="/logo.png" alt="MM Logo" />
+          <Link to="/" className="logo-text">MovieMatch</Link>
 
-      {toast && <div className="toast">{toast}</div>}
-      {error && <div className="error-msg">{error}</div>}
-
-      {!preferences[userName] && recommendations.length === 0 && (
-        <div className="input-block">
-          <input
-            type="text"
-            placeholder={placeholders[Math.floor(Math.random() * placeholders.length)]}
-            value={myPreference}
-            onChange={(e) => setMyPreference(e.target.value)}
-          />
-          <button onClick={handleSubmitPreference}>Submit</button>
         </div>
-      )}
+        <div className="nav-links">
+          <a href="#about">About</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="https://github.com">GitHub</a>
+        </div>
+      </nav>
+      <div className="room-container">
+        <header className="room-header">
+          <h1 className="room-title">Room: {roomId}</h1>
+          <h2 className="room-subtitle">Welcome, <span className="highlight">{userName}</span>!</h2>
+        </header>
 
-      <div className="progress">{submittedCount} of {members.length} submitted</div>
+        {toast && <div className="toast">{toast}</div>}
+        {error && <div className="error-msg">{error}</div>}
 
-      <ul className="preference-list">
-        {members.map((member) => (
-          <li key={member}>
-            <strong>{member}</strong>: {preferences[member] || '⏳ Waiting...'}
-          </li>
-        ))}
-      </ul>
+        {!preferences[userName] && recommendations.length === 0 && (
+          <div className="input-area">
+            <label className="input-label">Share Your Movie Preference</label>
+            <div className="input-block">
+              <input
+                type="text"
+                placeholder={placeholders[Math.floor(Math.random() * placeholders.length)]}
+                value={myPreference}
+                onChange={(e) => setMyPreference(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleSubmitPreference()}
+              />
+              <button onClick={handleSubmitPreference}>Submit</button>
+            </div>
+          </div>
+        )}
 
-      {allSubmitted && !loading && (
-        <button className="generate-btn" onClick={handleGenerate}>
-          Generate Recommendations
-        </button>
-      )}
+        <div className="progress-block">
+          <div className="progress">
+            <span>
+              <span className="submitted-count">{submittedCount}</span> of {members.length} users have submitted preferences
+            </span>
+            <div className="progress-bar">
+              <div
+                className="progress-bar-fill"
+                style={{
+                  width: `${(submittedCount / members.length) * 100}%`,
+                }}
+              />
+            </div>
+          </div>
+          <div style={{ height: '24px' }} />
+          <ul className="preference-list">
+              <li className="list-header">Group Preferences</li>
+              {members.map((member) => (
+                  <li key={member} className="preference-item">
+                  <span className="status-icon">
+                      {preferences[member] ? <Check size={18} strokeWidth={2.5} /> : <Clock size={18} strokeWidth={2} />}
+                  </span>
+                  <strong>{member}:</strong> {preferences[member] || 'Waiting...'}
+                  </li>
+              ))}
+          </ul>
 
-      {loading && <p className="loading">🔄 Generating suggestions...</p>}
+        </div>
 
-      {recommendations.length > 0 && (
-        <div className="recommendation-grid">
-          {recommendations.map((movie, i) => {
-            const { up, down } = voteStats(movie.title);
-            const voted = votes[movie.title]?.[userName];
-            return (
-              <div className="movie-card" key={i}>
-                {movie.poster && <img src={movie.poster} alt={movie.title} />}
-                <h4>{movie.title} ({movie.year})</h4>
-                <p>{movie.why}</p>
-                {movie.trailer && <a href={movie.trailer} target="_blank">Watch Trailer</a>}
-                <div className="vote-row">
-                  <button className={voted === 'up' ? 'voted' : ''} onClick={() => handleVote(movie.title, 'up')}>👍</button>
-                  <button className={voted === 'down' ? 'voted' : ''} onClick={() => handleVote(movie.title, 'down')}>👎</button>
-                </div>
-                {voted && (
-                  <div className="vote-counts">
-                    <span>👍 {up}</span> <span>👎 {down}</span>
+        {allSubmitted && !loading && (
+          <button className="generate-btn" onClick={handleGenerate}>
+            Generate Recommendations
+          </button>
+        )}
+
+        {loading && (
+          <p className="loading">
+              <Loader size={18} className="spin" style={{ marginRight: 8, verticalAlign: 'middle' }} />
+              Generating suggestions...
+          </p>
+          )}
+
+
+        {recommendations.length > 0 && (
+          <div className="recommendation-grid">
+            {recommendations.map((movie, i) => {
+              const { up, down } = voteStats(movie.title);
+              const voted = votes[movie.title]?.[userName];
+              return (
+                <div className="movie-card" key={i}>
+                  {movie.poster && (
+                    <img
+                      src={movie.poster}
+                      alt={movie.title}
+                      className="movie-poster"
+                    />
+                  )}
+                  <h4 className="movie-title">{movie.title} ({movie.year})</h4>
+                  <p className="movie-reason">
+                    {expandedDescriptions[movie.title]
+                      ? movie.why
+                      : movie.why.length > 120
+                        ? movie.why.slice(0, 120) + '...'
+                        : movie.why}
+                  </p>
+
+                  {movie.why.length > 120 && (
+                    <span
+                      className="show-more-text"
+                      onClick={() =>
+                        setExpandedDescriptions((prev) => ({
+                          ...prev,
+                          [movie.title]: !prev[movie.title],
+                        }))
+                      }
+                    >
+                      {expandedDescriptions[movie.title] ? 'Show less' : 'Show more'}
+                    </span>
+                  )}
+                  {movie.trailer && (
+                    <a href={movie.trailer} className="trailer-link" target="_blank" rel="noopener noreferrer">
+                      Watch Trailer
+                    </a>
+                  )}
+                  <div className="vote-row aligned-votes">
+                    <div className="vote-block">
+                      <span className="vote-number">{up}</span>
+                      <button
+                        className={voted === 'up' ? 'vote-btn voted' : 'vote-btn'}
+                        onClick={() => handleVote(movie.title, 'up')}
+                      >
+                        <ThumbsUp size={20} />
+                      </button>
+                    </div>
+
+                    <div className="vote-block">
+                      <button
+                        className={voted === 'down' ? 'vote-btn voted' : 'vote-btn'}
+                        onClick={() => handleVote(movie.title, 'down')}
+                      >
+                        <ThumbsDown size={20} />
+                      </button>
+                      <span className="vote-number">{down}</span>
+                    </div>
                   </div>
-                )}
-              </div>
-            );
-          })}
+
+
+                </div>
+              );
+            })}
         </div>
-      )}
+
+        )}
+      </div>
     </div>
   );
 };

@@ -1,3 +1,4 @@
+// LandingPage.tsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { db } from '../firebase';
@@ -11,7 +12,8 @@ import {
   Timestamp,
 } from 'firebase/firestore';
 
-import './LandingPage.css'; // Add styles here
+import './LandingPage.css';
+import { Github, Linkedin, Twitter } from 'lucide-react';
 
 const LandingPage: React.FC = () => {
   const [userName, setUserName] = useState('');
@@ -106,34 +108,58 @@ const LandingPage: React.FC = () => {
   };
 
   return (
-    <div className="landing-container">
-      <h1 className="title">MovieMatch</h1>
+    <div className="landing-wrapper">
+      <nav className="navbar">
+        <div className="logo">
+          <img src="/logo.png" alt="MM Logo" />
+          <span>MovieMatch</span>
+        </div>
+        <div className="nav-links">
+          <a href="#about">About</a>
+          <a href="#how-it-works">How It Works</a>
+          <a href="https://github.com">GitHub</a>
+        </div>
+      </nav>
 
-      <input
-        type="text"
-        placeholder="Enter your name"
-        value={userName}
-        onChange={(e) => setUserName(e.target.value)}
-        className="input"
-      />
+      <header className="hero">
+        <span className="badge">✨ AI-powered group movie matching</span>
+        <h1><span>Watch smarter.</span><br /><span>Together.</span></h1>
+        <p>Get movie recommendations everyone will love.</p>
+      </header>
 
-      <button onClick={handleCreateRoom} className="button">
-        Create Room
-      </button>
+      <section className="form-card">
+        <input
+          type="text"
+          placeholder="Enter your name..."
+          value={userName}
+          onChange={(e) => setUserName(e.target.value)}
+        />
+        <button onClick={handleCreateRoom}>Create Room</button>
+        <div className="divider">OR</div>
+        <input
+          type="text"
+          placeholder="Enter room code"
+          value={joinCode}
+          onChange={(e) => setJoinCode(e.target.value)}
+        />
+        <button onClick={handleJoinRoom}>Join Room</button>
+        {error && <p className="error-msg">{error}</p>}
+      </section>
 
-      <input
-        type="text"
-        placeholder="Enter room code"
-        value={joinCode}
-        onChange={(e) => setJoinCode(e.target.value)}
-        className="input"
-      />
-
-      <button onClick={handleJoinRoom} className="button">
-        Join Room
-      </button>
-
-      {error && <p className="error">{error}</p>}
+      <footer className="footer">
+        <div className="footer-left">
+          <img src="/logo.png" alt="MM Logo" />
+          <span>MovieMatch</span>
+        </div>
+        <div className="footer-icons">
+          <a href="https://github.com"><Github /></a>
+          <a href="https://linkedin.com"><Linkedin /></a>
+          <a href="https://twitter.com"><Twitter /></a>
+        </div>
+        <div className="footer-right">
+          © 2024 MovieMatch. All rights reserved.
+        </div>
+      </footer>
     </div>
   );
 };
