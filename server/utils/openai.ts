@@ -5,10 +5,10 @@ const openai = new OpenAI({
 });
 
 
-export async function getMovieRecommendations(preferences: string[]) {
+export async function getMovieRecommendations(preferences: { name: string; preference: string }[]) {
     const prompt = `
 These are the preferences of a group of ${preferences.length} people:
-${preferences.map((p, i) => `- Person ${i + 1}: "${p}"`).join("\n")}
+${preferences.map(p => `- ${p.name}: "${p.preference}"`).join("\n")}
 
 Suggest 6 real, existing movies that would satisfy all these tastes. For each, include:
 - Title
@@ -22,7 +22,7 @@ Respond with a list like:
     const chat = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
         messages: [{ role: "user", content: prompt }],
-        temperature: 0.7
+        temperature: 0.5
     });
 
     const content = chat.choices[0]?.message?.content || "";

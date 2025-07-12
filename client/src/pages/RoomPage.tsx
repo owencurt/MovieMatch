@@ -85,7 +85,13 @@ const RoomPage: React.FC = () => {
       const response = await fetch('http://localhost:4000/api/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ preferences: members.map((name) => preferences[name]) }),
+        body: JSON.stringify({
+        preferences: members.map((name) => ({
+          name,
+          preference: preferences[name]
+        }))
+      }),
+
       });
       if (!response.ok) throw new Error('Server error');
       const data = await response.json();
