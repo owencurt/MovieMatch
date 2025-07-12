@@ -10,7 +10,7 @@ export async function getMovieRecommendations(preferences: string[]) {
 These are the preferences of a group of ${preferences.length} people:
 ${preferences.map((p, i) => `- Person ${i + 1}: "${p}"`).join("\n")}
 
-Suggest 5 real, existing movies that would satisfy all these tastes. For each, include:
+Suggest 6 real, existing movies that would satisfy all these tastes. For each, include:
 - Title
 - Year
 - Why it's a good fit
