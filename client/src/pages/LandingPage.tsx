@@ -52,8 +52,10 @@ const LandingPage: React.FC = () => {
       await setDoc(roomRef, {
         roomId: code,
         members: [userName],
+        preferences: {},
         createdAt: Timestamp.now(),
-      });
+        });
+
 
       localStorage.setItem('userName', userName);
       navigate(`/room/${code}`);
