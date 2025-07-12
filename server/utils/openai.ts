@@ -18,7 +18,6 @@ Suggest 5 real, existing movies that would satisfy all these tastes. For each, i
 Respond with a list like:
 1. Title (Year): Reason
 `;
-    console.log("Prompt sent to GPT:\n", prompt);
 
     const chat = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
