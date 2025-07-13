@@ -1,6 +1,6 @@
 // LandingPage.tsx
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { db } from '../firebase';
 import {
   doc,
@@ -115,9 +115,7 @@ const LandingPage: React.FC = () => {
           <span>MovieMatch</span>
         </div>
         <div className="nav-links">
-          <a href="#about">About</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="https://github.com">GitHub</a>
+          <a href="https://github.com/owencurt/MovieMatch" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
       </nav>
 
@@ -152,12 +150,11 @@ const LandingPage: React.FC = () => {
           <span>MovieMatch</span>
         </div>
         <div className="footer-icons">
-          <a href="https://github.com"><Github /></a>
-          <a href="https://linkedin.com"><Linkedin /></a>
-          <a href="https://twitter.com"><Twitter /></a>
+          <a href="https://github.com/owencurt/MovieMatch" target="_blank" rel="noopener noreferrer"><Github /></a>
+          <a href="https://www.linkedin.com/in/owen-curtis-982003319/" target="_blank" rel="noopener noreferrer"><Linkedin /></a>
         </div>
         <div className="footer-right">
-          © 2024 MovieMatch. All rights reserved.
+          © 2025 MovieMatch. All rights reserved.
         </div>
       </footer>
     </div>

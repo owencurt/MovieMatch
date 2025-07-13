@@ -57,6 +57,7 @@ const RoomPage: React.FC = () => {
       setMembers(data.members || []);
       setPreferences(data.preferences || {});
       setVotes(data.votes || {});
+      setRecommendations(data.recommendations || []);
     });
 
     return () => unsub();
@@ -96,6 +97,11 @@ const RoomPage: React.FC = () => {
       if (!response.ok) throw new Error('Server error');
       const data = await response.json();
       setRecommendations(data);
+      const roomRef = doc(db, 'rooms', roomId!);
+      await updateDoc(roomRef, {
+        recommendations: data
+      });
+
     } catch (err) {
       console.error('Error generating recommendations:', err);
       setError('Failed to get recommendations.');
@@ -103,6 +109,32 @@ const RoomPage: React.FC = () => {
       setLoading(false);
     }
   };
+
+  const handleReset = async () => {
+    try {
+      const roomRef = doc(db, 'rooms', roomId!);
+
+      const preferenceDeletes = members.reduce((acc, member) => {
+        acc[`preferences.${member}`] = deleteField();
+        return acc;
+      }, {} as any);
+
+      await updateDoc(roomRef, {
+        ...preferenceDeletes,
+        recommendations: deleteField(),
+        votes: deleteField(), 
+      });
+
+      setMyPreference('');
+      setRecommendations([]);
+      setToast('🔄 Ready for new preferences!');
+      setTimeout(() => setToast(''), 3000);
+    } catch (err) {
+      console.error("Failed to reset room:", err);
+      setError("Failed to reset for new recommendations.");
+    }
+  };
+
 
   const handleVote = async (title: string, direction: 'up' | 'down') => {
   const currentVote = votes[title]?.[userName];
@@ -145,9 +177,7 @@ const RoomPage: React.FC = () => {
 
         </div>
         <div className="nav-links">
-          <a href="#about">About</a>
-          <a href="#how-it-works">How It Works</a>
-          <a href="https://github.com">GitHub</a>
+          <a href="https://github.com/owencurt/MovieMatch" target="_blank" rel="noopener noreferrer">GitHub</a>
         </div>
       </nav>
       <div className="room-container">
@@ -205,10 +235,17 @@ const RoomPage: React.FC = () => {
         </div>
 
         {allSubmitted && !loading && (
-          <button className="generate-btn" onClick={handleGenerate}>
-            Generate Recommendations
-          </button>
+          recommendations.length === 0 ? (
+            <button className="generate-btn" onClick={handleGenerate}>
+              Generate Recommendations
+            </button>
+          ) : (
+            <button className="generate-btn" onClick={handleReset}>
+              New Recommendations
+            </button>
+          )
         )}
+
 
         {loading && (
           <p className="loading">
