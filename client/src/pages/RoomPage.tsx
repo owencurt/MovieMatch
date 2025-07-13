@@ -84,6 +84,7 @@ const RoomPage: React.FC = () => {
   const handleGenerate = async () => {
     setLoading(true);
     try {
+      // block backend URL
       const response = await fetch(`${BASE_URL}/api/recommend`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
