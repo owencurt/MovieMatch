@@ -35,6 +35,7 @@ const RoomPage: React.FC = () => {
   const [votes, setVotes] = useState<{ [title: string]: { [user: string]: 'up' | 'down' } }>({});
   const [toast, setToast] = useState('');
   const [expandedDescriptions, setExpandedDescriptions] = useState<{ [title: string]: boolean }>({});
+  const BASE_URL = process.env.REACT_APP_BACKEND_URL;
 
 
   useEffect(() => {
@@ -83,7 +84,7 @@ const RoomPage: React.FC = () => {
   const handleGenerate = async () => {
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:4000/api/recommend', {
+      const response = await fetch('${BASE_URL}/api/recommend', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
