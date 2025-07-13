@@ -4,6 +4,7 @@ import { fetchTMDbMetadata } from "../utils/tmdb";
 
 const router = express.Router();
 
+
 router.post("/", async (req, res) => {
   try {
     const { preferences } = req.body;
