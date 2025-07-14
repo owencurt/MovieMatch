@@ -174,7 +174,7 @@ const RoomPage: React.FC = () => {
     <div className="page-wrapper">
       <nav className="navbar">
         <div className="logo">
-          <img src="/logo.png" alt="MM Logo" />
+          <img src="/logo512.png" alt="MM Logo" />
           <Link to="/" className="logo-text">MovieMatch</Link>
 
         </div>

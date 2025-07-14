@@ -111,7 +111,7 @@ const LandingPage: React.FC = () => {
     <div className="landing-wrapper">
       <nav className="navbar">
         <div className="logo">
-          <img src="/logo.png" alt="MM Logo" />
+          <img src="/logo512.png" alt="MM Logo" />
           <span>MovieMatch</span>
         </div>
         <div className="nav-links">
@@ -146,7 +146,7 @@ const LandingPage: React.FC = () => {
 
       <footer className="footer">
         <div className="footer-left">
-          <img src="/logo.png" alt="MM Logo" />
+          <img src="/logo512.png" alt="MM Logo" />
           <span>MovieMatch</span>
         </div>
         <div className="footer-icons">
