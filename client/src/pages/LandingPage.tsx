@@ -146,7 +146,7 @@ const LandingPage: React.FC = () => {
 
       <footer className="footer">
         <div className="footer-left">
-          <img src="/logo512.png" alt="MM Logo" />
+          <img src="/logo192.png" alt="MM Logo" style={{ height: "30px", width: "auto" }} />
           <span>MovieMatch</span>
         </div>
         <div className="footer-icons">
